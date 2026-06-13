@@ -231,7 +231,7 @@ Click incremented successfully for code: react-ref. Performing redirect 302 to h
 
 ## 🎥 Demonstration Video
 
-[Watch the full application walkthrough on Loom](YOUR_LOOM_LINK_HERE)
+[Watch the full application walkthrough on YouTube](https://youtu.be/4wRd57o0U5k?si=vu_N2-o9-hSfSHvW)
 
 ---
 
