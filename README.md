@@ -40,6 +40,8 @@ The goal was to design a developer-friendly, marketing-oriented URL shortener da
 
 Below is the conceptual visual architecture of LinkSnip, mapping the interaction between the React SPA client, the Express Node backend, the Mongoose models, and MongoDB.
 
+![LinkSnip Architecture Diagram](./architecture_diagram.png)
+
 ```mermaid
 graph TD
     %% User/Browser interactions
