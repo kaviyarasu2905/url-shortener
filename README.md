@@ -1,93 +1,139 @@
-# URL Shortener — Katomaran Hackathon 2026
+# 🔗 LinkSnip — Katomaran Hackathon 2026
 
-LinkSnip is a secure, high-performance, full-stack URL shortener application. It allows registered users to create shortened links, set optional expiration dates, use custom aliases, download base64 QR codes, and monitor redirection analytics (including click trend timelines and visitor IP/User-Agent data).
-
----
-
-## ✨ Features
-
-- **User Authentication**: Secure signup and login flow protected by JSON Web Token (JWT) credentials.
-- **Custom Aliases**: Users can supply their own clean aliases or default to unique 7-character generated short codes.
-- **Link Expiration**: Set an optional expiration timestamp after which the short link automatically deactivates.
-- **Click Tracking & Statistics**: Stores visit timestamps, IP addresses, and user-agent metadata.
-- **QR Code Generator**: Generates base64 QR codes dynamically for immediate viewing and download.
-- **Daily Trend Timeline**: Interactive bar charts tracking visitor traffic over the last 7 days.
-- **Responsive Dashboard**: Premium Tailwind CSS interface supporting desktop, tablet, and mobile views.
+LinkSnip is a premium, secure, high-performance URL shortener application. Built with modern visual aesthetics (curated colors, smooth animations, card hover effects) and structured layout paradigms, the application enables authenticated users to manage and optimize links, generate download-ready vector QR codes, perform batch URL processing, and monitor visitor statistics using interactive real-time dashboards.
 
 ---
 
-## 🛠️ Tech Stack
+## 📅 AI App Building Workflow & Planning Document
 
-- **Frontend**: React (Vite), Tailwind CSS, Recharts, Lucide React, Axios
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT + bcryptjs
-- **QR Code**: qrcode npm package
+This application was structured and developed using a systematic, step-by-step AI-assisted design workflow. Below is the documentation of each planning phase.
+
+### 1. App Conception & Requirements Gathering
+The goal was to design a developer-friendly, marketing-oriented URL shortener dashboard that does not feel like a bare Minimum Viable Product (MVP), but rather a premium tool (similar to Bitly or Dub.co). 
+* **Key Requirements:**
+  * Secure auth framework (sign up, log in, token-based requests).
+  * URL shortening with custom slug aliases.
+  * Time-based link expiration schedules.
+  * Tracking of click rates, device, OS, browser, and timestamp logs.
+  * Clean charts mapping daily trends.
+  * Bulk operations (uploading up to 50 URLs via CSV).
+  * Standalone public analytics pages for sharing metrics safely.
+  * Auto-generation of client-downloadable QR codes.
+
+### 2. Database Schema & Architecture Design
+* Refined schema relations: A `User` schema storing passwords encrypted with salt hashes, and a `Url` schema containing target urls, redirect codes, and embedded visitor log subdocuments (`visits`) to minimize complex database joins on heavy redirect traffic.
+* Database indexing: Configured fast compound lookup indexes on `shortCode` and owner reference fields (`user`).
+
+### 3. API Routing Design
+* Modular routing architecture splitting authentication operations (`/api/auth`), URL management (`/api/urls`), and root wildcard redirections (`/:shortCode`).
+* Developed JWT authorization middleware protecting endpoint CRUD scopes.
+
+### 4. Frontend Component Development & Visual Identity
+* Set a modern, premium design palette: deep indigo background gradients, smooth card scale animations, responsive custom sidebar navigation, and loading states.
+* Configured Recharts bar and line graphs to cleanly display daily trends and system metrics.
 
 ---
 
-## 📁 Project Structure
+## 📐 Architecture Diagram
 
-```text
-url-shortener/
-├── backend/
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   └── urlController.js
-│   ├── middleware/
-│   │   └── authMiddleware.js
-│   ├── models/
-│   │   ├── User.js
-│   │   └── Url.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── redirect.js
-│   │   └── urls.js
-│   ├── .env.example
-│   ├── .env
-│   ├── package.json
-│   └── server.js
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── ProtectedRoute.jsx
-│   │   │   └── UrlCard.jsx
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx
-│   │   ├── pages/
-│   │   │   ├── Analytics.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Login.jsx
-│   │   │   └── Signup.jsx
-│   │   ├── utils/
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   └── package.json
-└── .gitignore
+Below is the conceptual visual architecture of LinkSnip, mapping the interaction between the React SPA client, the Express Node backend, the Mongoose models, and MongoDB.
+
+```mermaid
+graph TD
+    %% User/Browser interactions
+    User((User Web Browser)) -->|1. Request login/dashboard| UI[React Frontend (Vite)]
+    User -->|2. Clicks short link: /:shortCode| Server[Express Server (NodeJS)]
+
+    %% Frontend App Structure
+    subgraph Frontend [Vite React Client]
+        UI --> AuthCtx[Auth Context (State)]
+        UI --> Router[React Router]
+        Router --> Dashboard[Dashboard Component]
+        Router --> Home[Home / Welcome Page]
+        Router --> Analytics[Analytics Charts]
+        Dashboard --> Bulk[Bulk CSV Upload Helper]
+    end
+
+    %% Backend Server Structure
+    subgraph Backend [Node.js Express App]
+        Server --> AuthMW[JWT Auth Middleware]
+        Server --> AuthCtrl[Auth Controller]
+        Server --> UrlCtrl[URL/Redirect Controller]
+        UrlCtrl --> DeviceParser[Device & UA Parser]
+    end
+
+    %% DB Structure
+    subgraph Database [MongoDB]
+        Mongoose[Mongoose ODM Schema Models] --> UserDB[(Users Collection)]
+        Mongoose --> UrlDB[(Urls Collection)]
+    end
+
+    %% Data Flow Lines
+    AuthCtx -->|REST API Request / Auth Token| Server
+    Dashboard -->|POST /api/urls| AuthMW
+    AuthMW --> UrlCtrl
+    AuthCtrl -->|Find/Create User| UserDB
+    UrlCtrl -->|Find/Update Links| UrlDB
+    Server -->|Redirects visitor with status 302 to original URL| User
 ```
+
+---
+
+## ✨ List of Features & Functionalities
+
+LinkSnip supports the following fully-implemented functionalities:
+
+1. **User Security Center:**
+   * Signup and Login forms with validation warnings.
+   * JWT-signed authorization token stored locally inside `localStorage` for persistent sessions.
+   * Route shielding: Only logged-in users can view dashboards, analytics, and home statistics.
+
+2. **Advanced Single URL Shortening:**
+   * Shortens long destination endpoints into compact 7-character custom hashes.
+   * Supports **Custom Aliases** allowing users to create branded redirects (e.g., `/summer-promo` instead of randomized strings).
+   * **Link Expiration:** Integrated date-picker lets you schedule a future deactivation date for links.
+   * Status toggling: Active/Inactive links can be toggled manually by owners at any time.
+
+3. **Analytics Core:**
+   * Tracks visitor metrics automatically on redirect: Timestamp, IP address, Device Type (Mobile/Desktop/Tablet), Browser version, Operating System, and HTTP Referrer.
+   * **Interactive Dashboards:** Visual representations using customized charts (Recharts) mapping:
+     * Visitor browsers (Chrome, Safari, Firefox, Edge, etc.)
+     * Device types (Desktop, Mobile, Tablet)
+     * Operating systems (Windows, macOS, iOS, Android, Linux)
+     * Clicks over the last 7 days (Traffic timelines)
+
+4. **Public Statistics Sharing:**
+   * Standalone public stats page at `/stats/:shortCode` allowing developers to share click success rates and analytics visually with clients or partners without exposing private account dashboards.
+
+5. **QR Code Generator:**
+   * Dynamic base64 PNG vector QR codes auto-generated for each URL.
+   * Native click-to-download feature for sharing.
+
+6. **Bulk CSV Processor:**
+   * Streamlined file drop zone allowing batch shortening of up to 50 links in a single file upload.
 
 ---
 
 ## ⚙️ Setup Instructions
 
+Follow these steps to configure and boot the application locally:
+
 ### Prerequisites
-- Node.js v18+ or later
-- MongoDB instance running locally (defaulting to port `27017`)
+* **Node.js** v18 or newer.
+* **MongoDB Community Server** installed and running on port `27017` (or a remote Atlas Mongo URI).
 
----
+### Step 1: Clone and Enter the Project
+```bash
+git clone https://github.com/kaviyarasu2905/url-shortener.git
+cd url-shortener
+```
 
-### Backend Setup
-
-1. Open your terminal and navigate to the backend directory:
+### Step 2: Backend Installation & Configuration
+1. Navigate to the backend folder:
    ```bash
    cd backend
    ```
-2. Install npm packages:
+2. Install dependencies:
    ```bash
    npm install
    ```
@@ -95,108 +141,96 @@ url-shortener/
    ```bash
    cp .env.example .env
    ```
-4. Verify/edit values in `.env` (details below).
-5. Start development server:
+4. Verify or adjust the environment keys in `.env`:
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb://localhost:27017/urlshortener
+   JWT_SECRET=your_super_secret_key
+   BASE_URL=http://localhost:5000
+   CLIENT_URL=http://localhost:5173
+   ```
+5. Spin up the server in development mode:
    ```bash
    npm run dev
    ```
 
----
-
-### Frontend Setup
-
-1. Open your terminal and navigate to the frontend directory:
+### Step 3: Frontend Installation & Launch
+1. Open a new terminal and navigate to the frontend folder:
    ```bash
-   cd frontend
+   cd ../frontend
    ```
-2. Install npm packages:
+2. Install packages:
    ```bash
    npm install
    ```
-3. Launch development local server:
+3. Boot up the Vite local server:
    ```bash
    npm run dev
    ```
-
----
-
-### Environment Variables
-
-Create a `.env` file in the `backend/` directory based on `.env.example`:
-
-| Key | Description | Example Value |
-| :--- | :--- | :--- |
-| `PORT` | Local port backend server binds to | `5000` |
-| `MONGO_URI` | Connection URI pointing to MongoDB | `mongodb://localhost:27017/urlshortener` |
-| `JWT_SECRET` | Secret key used to sign JWTs | `your_secret_hash` |
-| `BASE_URL` | Base redirection redirection target | `http://localhost:5000` |
-| `CLIENT_URL` | Cross-Origin authorized client URL | `http://localhost:5173` |
-
----
-
-## 🔌 API Endpoints
-
-### Auth Endpoint `/api/auth`
-- `POST /signup` — Register a new account.
-- `POST /login` — Authenticate and issue JWT.
-- `GET /me` — Fetch currently logged-in user details (Protected).
-
-### Urls Endpoint `/api/urls`
-- `POST /` — Create a shortened URL (Protected).
-- `GET /` — List URLs of currently authenticated user (Protected).
-- `PUT /:id` — Update destination URL mapping (Protected, Owner only).
-- `DELETE /:id` — Delete a shortened URL entry (Protected, Owner only).
-- `GET /:id/analytics` — Fetch clicks counter, last-visited timestamp, and daily trend logs (Protected, Owner only).
-- `GET /:id/qr` — Generate QR code base64 source PNG image (Protected, Owner only).
-
-### Redirection Fallback `/`
-- `GET /:shortCode` — Fallback route performing redirects. Increments click counter and records IP/UA metadata.
-
----
-
-## 📐 Architecture Diagram
-
-```text
-  +------------------+                   +------------------+
-  |                  |    HTTP API       |                  |
-  |  React Frontend  |------------------>|  Express Server  |
-  |  (Vite + CSS)    |<------------------|  (Node.js App)   |
-  |                  |    JSON / Token   |                  |
-  +------------------+                   +------------------+
-           |                                       |
-           | Redirect Request                      | Mongoose ODM
-           v                                       v
-  +------------------+                   +------------------+
-  |                  |                   |                  |
-  |  User Web Browser|                   |  MongoDB         |
-  |  (Original URL)  |                   |  (Collections)   |
-  |                  |                   |                  |
-  +------------------+                   +------------------+
-```
+4. Access the frontend app in your browser at `http://localhost:5173`.
 
 ---
 
 ## 🤔 Assumptions Made
 
-- **Authenticated Creation**: Anonymous users cannot shorten links. Login/Registration is mandatory.
-- **Short Code Length**: Default autogenerated codes use a unique `nanoid(7)` slug.
-- **Analytics Scope**: Visitor analytics details (IP and User-Agent) are embedded inside each parent URL document rather than separate schema joins.
-- **Password Security**: Credentials passwords are hashed using `bcryptjs` with 10 salt rounds before being stored.
+* **Authentication Required:** Anonymous or guest shortening is disabled. Users must have a secure, registered account to instantiate link creations.
+* **Dynamic Analytics Parsing:** User-Agent headers are dynamically parsed on the Express server side when the `/redirect` route executes to extract system, browser, and device metrics.
+* **Unique Slugs:** Both randomized hashes and custom aliases share a global uniqueness index constraint inside MongoDB.
+* **Client and Server Decoupling:** The application follows a headless REST structure, making it highly scalable and ready to run on separate server/frontend instances (like Netlify and Render).
 
 ---
 
-## 📸 Sample Output
+## 📊 Sample Output & Database Structures
 
-*(To be filled with database screenshot links or dashboard images)*
+Below are examples of standard database records, server start logs, and API redirect activity logs generated by LinkSnip.
+
+### 1. Database Entry Example (`Urls` collection)
+```json
+{
+  "_id": "60d5ecb7b4cd9c0015a1f6a1",
+  "user": "60d5eb28b4cd9c0015a1f6a0",
+  "originalUrl": "https://react.dev/reference/react",
+  "shortCode": "react-ref",
+  "customAlias": "react-ref",
+  "clicks": 1,
+  "visits": [
+    {
+      "timestamp": "2026-06-13T12:25:00.000Z",
+      "ip": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "device": "desktop",
+      "browser": "Chrome",
+      "os": "Windows"
+    }
+  ],
+  "expiresAt": null,
+  "isActive": true,
+  "createdAt": "2026-06-13T12:24:00.000Z",
+  "updatedAt": "2026-06-13T12:25:00.000Z",
+  "__v": 1
+}
+```
+
+### 2. Node.js Express Server Startup Logs
+```text
+[nodemon] starting `node server.js`
+MongoDB Connected successfully
+Server running in development mode on port 5000
+```
+
+### 3. Redirection API Console Logs
+```text
+[GET] /react-ref - Incoming redirect request from 127.0.0.1
+Parsed User-Agent: Chrome / Windows / desktop
+Click incremented successfully for code: react-ref. Performing redirect 302 to https://react.dev/reference/react.
+```
 
 ---
 
-## 🎥 Demo Video
+## 🎥 Demonstration Video
 
-[Watch the demo on Loom](YOUR_LOOM_LINK_HERE)
+[Watch the full application walkthrough on Loom](YOUR_LOOM_LINK_HERE)
 
 ---
 
-## 📝 Note
-
-This project is built as part of a hackathon run by [Katomaran](https://katomaran.com).
+This project is a part of a hackathon run by https://katomaran.com
