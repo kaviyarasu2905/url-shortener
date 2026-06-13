@@ -2,6 +2,8 @@
 
 LinkSnip is a premium, secure, high-performance URL shortener application. Built with modern visual aesthetics (curated colors, smooth animations, card hover effects) and structured layout paradigms, the application enables authenticated users to manage and optimize links, generate download-ready vector QR codes, perform batch URL processing, and monitor visitor statistics using interactive real-time dashboards.
 
+**⚡ Live Application:** [https://linksnip-kavi.netlify.app](https://linksnip-kavi.netlify.app)
+
 ---
 
 ## 📅 AI App Building Workflow & Planning Document
