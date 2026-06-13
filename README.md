@@ -43,31 +43,31 @@ Below is the conceptual visual architecture of LinkSnip, mapping the interaction
 ```mermaid
 graph TD
     %% User/Browser interactions
-    User((User Web Browser)) -->|1. Request login/dashboard| UI[React Frontend (Vite)]
-    User -->|2. Clicks short link: /:shortCode| Server[Express Server (NodeJS)]
+    User((User Web Browser)) -->|1. Request login/dashboard| UI["React Frontend (Vite)"]
+    User -->|2. Clicks short link: /:shortCode| Server["Express Server (NodeJS)"]
 
     %% Frontend App Structure
-    subgraph Frontend [Vite React Client]
-        UI --> AuthCtx[Auth Context (State)]
+    subgraph Frontend ["Vite React Client"]
+        UI --> AuthCtx["Auth Context (State)"]
         UI --> Router[React Router]
         Router --> Dashboard[Dashboard Component]
-        Router --> Home[Home / Welcome Page]
+        Router --> Home["Home / Welcome Page"]
         Router --> Analytics[Analytics Charts]
         Dashboard --> Bulk[Bulk CSV Upload Helper]
     end
 
     %% Backend Server Structure
-    subgraph Backend [Node.js Express App]
-        Server --> AuthMW[JWT Auth Middleware]
+    subgraph Backend ["Node.js Express App"]
+        Server --> AuthMW["JWT Auth Middleware"]
         Server --> AuthCtrl[Auth Controller]
-        Server --> UrlCtrl[URL/Redirect Controller]
-        UrlCtrl --> DeviceParser[Device & UA Parser]
+        Server --> UrlCtrl["URL/Redirect Controller"]
+        UrlCtrl --> DeviceParser["Device & UA Parser"]
     end
 
     %% DB Structure
-    subgraph Database [MongoDB]
-        Mongoose[Mongoose ODM Schema Models] --> UserDB[(Users Collection)]
-        Mongoose --> UrlDB[(Urls Collection)]
+    subgraph Database ["MongoDB"]
+        Mongoose["Mongoose ODM Schema Models"] --> UserDB[("Users Collection")]
+        Mongoose --> UrlDB[("Urls Collection")]
     end
 
     %% Data Flow Lines
